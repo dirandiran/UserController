@@ -1,0 +1,48 @@
+version: '3.3'
+networks:
+#  stack_net:
+#    driver: overlay
+#    ipam:
+#      driver: default
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 192.168.0.0/16
+
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+    - 3000:3306
+    - 33000:33060
+    networks:
+      net:
+          ipv4_address: 192.168.10.1
+
+  adminka:
+    image: adminer
+    restart: always
+    ports:
+    - 8080:8080
+    depends_on:
+    - db
+    networks:
+      net:
+          ipv4_address: 192.168.10.2
+
+  app:
+    image: user-controller #dirandiran/user-controller:1.0.0
+    ports:
+    - 8085:8085
+    restart: on-failure
+    depends_on:
+    - db
+    networks:
+      net:
+        ipv4_address: 192.168.10.3
