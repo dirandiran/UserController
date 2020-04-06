@@ -27,11 +27,18 @@ public class UserRestController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping(path = "/", produces = "application/json")
+    @GetMapping(path = "/", produces = "application/text")
     public String getMapping() {
-        return "Mapping:\n" +
-                "/users - get all users\n" +
-                "/user/id - get user by id";
+        return " Mapping:\n" +
+                "Http.GET: /users - get all users\n" +
+                "Http.GET: /user/id - get user by id\n" +
+                "Http.POST: /update/{id}/{riskProfile} - update User by id\n" +
+                "Http.PUT: /save/{riskProfile} - add new User\n" +
+                "Http.DELETE: /delete/{id} - delete User by id\n" +
+                "Http.POST: /merge/{id1}/{id2} - merge two users by their id\n" +
+                "If profile = 'h2'\n" +
+                "h2 console: http://localhost:8085/h2\n" +
+                "swagger ui: http://localhost:8085/swagger-ui.html";
     }
 
     @Transactional( propagation = Propagation.SUPPORTS,readOnly = true )
@@ -59,9 +66,11 @@ public class UserRestController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public RedirectView deleteUserById(@PathVariable("id") Long id) {
+    public /*RedirectView*/ User deleteUserById(@PathVariable("id") Long id) {
+        User userForDel = userRepository.findById(id).orElse(null);
         userRepository.deleteById(id);
-        return new RedirectView(url + "/users");
+//        return new RedirectView(url + "/users");
+        return userForDel;
     }
 
     @PostMapping(path = "/merge/{firstId}/{secondId}")

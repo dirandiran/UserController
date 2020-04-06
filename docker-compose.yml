@@ -37,7 +37,7 @@ services:
           ipv4_address: 192.168.10.2
 
   app:
-    image: user-controller #dirandiran/user-controller:1.0.0
+    image: user-controller #dirandiran/user-controller:2.0.0
     ports:
     - 8085:8085
     restart: on-failure
