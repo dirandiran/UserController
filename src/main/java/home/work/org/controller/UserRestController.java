@@ -5,6 +5,9 @@ import home.work.org.entity.User;
 import home.work.org.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +17,13 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.List;
 import java.util.Optional;
 
+@EnableKafka
 @RestController
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public class UserRestController {
+
+    @Autowired
+    private KafkaTemplate<Long, String> kafkaTemplate;
 
     private UserRepository userRepository;
     @Value("${users.url}")
@@ -43,14 +50,13 @@ public class UserRestController {
 
     @Transactional( propagation = Propagation.SUPPORTS,readOnly = true )
     @GetMapping(path = "/users", produces = "application/json")
-    @ResponseBody
     public List<User> getUsers() {
         return (List<User>) (userRepository.findAll());
     }
 
+    @CrossOrigin(origins = "*")
     @Transactional( propagation = Propagation.SUPPORTS,readOnly = true )
     @GetMapping(path = "user/{id}")
-    @ResponseBody
     public Optional<User> getUsersById(@PathVariable("id") Long id) {
         return userRepository.findById(id);
     }
@@ -90,5 +96,21 @@ public class UserRestController {
         } else {
             return null;
         }
+    }
+
+    @GetMapping(path = "/send")
+    public void produceMessageToKafka(){
+        kafkaTemplate.send("test",0, (long) 1, "Hello World!");
+        kafkaTemplate.send("test",2, (long) 1, "Hello World!");
+    }
+
+    @KafkaListener(topics = "test", groupId = "app.1")
+    private void printMessageFromTopicTest1(String msg){
+        System.out.println("Consumer-1: " + msg);
+    }
+
+    @KafkaListener(topics = "test", groupId = "app.1")
+    private void printMessageFromTopicTest2(String msg){
+        System.out.println("Consumer-2: " + msg);
     }
 }
