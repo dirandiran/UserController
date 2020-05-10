@@ -24,6 +24,7 @@ docker run --name=app -p 8085:8085 --network=usercontroller_net --link=usercontr
 mvn clean install с тестами.
 h2 console: http://localhost:8085/h2
 создание таблицы + наполнение данными: data.sql
+db files: C:\Users\<os_user>\temp.mv.db
 
 Сваггер для простого тестирования работающего сервиса:
 http://localhost:8085/swagger-ui.html

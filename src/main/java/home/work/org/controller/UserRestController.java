@@ -4,7 +4,6 @@ import home.work.org.entity.RiskProfile;
 import home.work.org.entity.User;
 import home.work.org.repository.UserRepository;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,10 +75,9 @@ public class UserRestController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public /*RedirectView*/ User deleteUserById(@PathVariable("id") Long id) {
+    public User deleteUserById(@PathVariable("id") Long id) {
         User userForDel = userRepository.findById(id).orElse(null);
         userRepository.deleteById(id);
-//        return new RedirectView(url + "/users");
         return userForDel;
     }
 
